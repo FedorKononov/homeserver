@@ -1,0 +1,62 @@
+---
+
+- name: Ensure mercurial installed.
+  apt: name=mercurial state=installed
+
+- name: Create mercurial user
+  user: name=mercurial shell=/bin/bash group=mercurial
+
+
+- stat: path=/home/mercurial/repos/ansible_homeserver
+  register: st
+
+- name: hg init new repo
+  shell: sudo -u mercurial hg init /home/mercurial/repos/ansible_homeserver
+  when: st.stat.exists == false
+
+- name: mkdir /home/mercurial/repos/ansible_homeserver
+  file: path=/home/mercurial/repos/ansible_homeserver state=directory owner=mercurial group=mercurial mode=0775 recurse=yes
+
+
+- stat: path=/home/mercurial/repos/boogeyman_raspberry
+  register: st
+
+- name: hg init new repo
+  shell: sudo -u mercurial hg init /home/mercurial/repos/boogeyman_raspberry
+  when: st.stat.exists == false
+
+- name: mkdir /home/mercurial/repos/boogeyman_raspberry
+  file: path=/home/mercurial/repos/boogeyman_raspberry state=directory owner=mercurial group=mercurial mode=0775 recurse=yes
+
+
+- stat: path=/home/mercurial/repos/boogeyman
+  register: st
+
+- name: hg init new repo
+  shell: sudo -u mercurial hg init /home/mercurial/repos/boogeyman
+  when: st.stat.exists == false
+
+- name: mkdir /home/mercurial/repos/boogeyman
+  file: path=/home/mercurial/repos/boogeyman state=directory owner=mercurial group=mercurial mode=0775 recurse=yes
+
+
+- stat: path=/home/mercurial/repos/pincity
+  register: st
+
+- name: hg init new repo
+  shell: sudo -u mercurial hg init /home/mercurial/repos/pincity
+  when: st.stat.exists == false
+
+- name: mkdir /home/mercurial/repos/pincity
+  file: path=/home/mercurial/repos/pincity state=directory owner=mercurial group=mercurial mode=0775 recurse=yes
+
+
+- stat: path=/home/mercurial/repos/boogeyman_notif
+  register: st
+
+- name: hg init new repo
+  shell: sudo -u mercurial hg init /home/mercurial/repos/boogeyman_notif
+  when: st.stat.exists == false
+
+- name: mkdir /home/mercurial/repos/boogeyman_notif
+  file: path=/home/mercurial/repos/boogeyman_notif state=directory owner=mercurial group=mercurial mode=0775 recurse=yes

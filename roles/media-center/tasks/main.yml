@@ -1,0 +1,23 @@
+---
+
+- name: Install minidlna
+  apt: name=minidlna state=installed
+
+- name: mkdir /var/lib/minidlna/
+  file: path=/var/lib/minidlna/ state=directory
+
+- name: Copy minidlna.conf
+  copy: src=etc/minidlna.conf dest=/etc/minidlna.conf
+  notify:
+    - restart minidlna
+
+- name: Install minidlna
+  apt: name=minidlna state=installed
+
+- name: Install transmission-daemon
+  apt: name=transmission-daemon state=installed
+
+- name: Copy transmission.json
+  copy: src=etc/transmission.json dest=/etc/transmission-daemon/settings.json 
+  notify:
+    - reload transmission-daemon

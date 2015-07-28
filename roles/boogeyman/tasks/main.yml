@@ -1,0 +1,97 @@
+---
+
+- name: Create boogeyman user
+  user: name=boogeyman shell=/bin/bash
+
+- name: Install nodejs
+  apt: name=nodejs state=installed
+
+- name: Install sqlite3
+  apt: name=sqlite3 state=installed
+
+- name: Update files boogeyman files from repo
+  hg: repo=/home/mercurial/repos/boogeyman dest=/home/boogeyman/htdocs revision=myhome force=yes
+  register: sync
+
+- name: Chmod /home/boogeyman/htdocs
+  file: path=/home/boogeyman/htdocs state=directory owner=boogeyman group=boogeyman mode=0755 recurse=yes
+  when: sync.changed
+
+- name: Copy files notificator files
+  hg: repo=/home/mercurial/repos/boogeyman_notif dest=/home/boogeyman/notif force=yes
+  register: sync2
+
+- name: Chmod /home/boogeyman/notif
+  file: path=/home/boogeyman/notif state=directory owner=boogeyman group=boogeyman mode=0755 recurse=yes
+  when: sync2.changed
+
+- name: Install socket.io
+  npm: name=socket.io state=present version=0.9.14 path=/home/boogeyman/notif
+
+- name: Template /etc/nginx/sites-available/boogeyman.conf
+  template: src=etc/nginx/sites-available/boogeyman.conf.j2 dest=/etc/nginx/sites-available/boogeyman.conf mode=0644
+  notify:
+    - restart nginx
+
+- name: mkdir /home/boogeyman/htdocs/storage/sessions
+  file: path=/home/boogeyman/htdocs/storage/sessions/ state=directory owner=boogeyman group=boogeyman
+
+- name: mkdir /home/boogeyman/htdocs/storage/database
+  file: path=/home/boogeyman/htdocs/storage/database/ state=directory owner=boogeyman group=boogeyman
+
+- name: Copy my dump
+  copy: src=dump/my_switchers.sqlite dest=/tmp/my_switchers.sqlite
+  register: st2
+
+- stat: path=/home/boogeyman/htdocs/storage/database/boogeyman.sqlite
+  register: st
+
+- name: Remove previous DB
+  shell: rm /home/boogeyman/htdocs/storage/database/boogeyman.sqlite
+  when: st.stat.exists and st2.changed
+
+- name: Create new DB
+  shell: sqlite3 /home/boogeyman/htdocs/storage/database/boogeyman.sqlite < /home/boogeyman/htdocs/boogeyman.sqlite.dump
+  when: st2.changed
+
+- name: Chmod storage
+  file: path=/home/boogeyman/htdocs/storage/ state=directory mode=0777 recurse=yes
+
+- name: Import my dump
+  shell: sqlite3 /home/boogeyman/htdocs/storage/database/boogeyman.sqlite < /tmp/my_switchers.sqlite
+  when: st2.changed
+
+- name: Cron sentinel
+  cron: name="sentinel" minute="*/10" user="boogeyman" job="/usr/bin/php /home/boogeyman/htdocs/artisan sentinel:patrol >> /tmp/sentinel.log" cron_file=boogeyman
+
+- name: Cron clean log
+  cron: name="boogeyman.log" minute=0 hour=0 user="boogeyman" job="/bin/echo 123 > /tmp/boogeyman.log" cron_file=boogeyman
+
+- name: Cron clean log
+  cron: name="boogeyman-notif.log" minute=0 hour=0 user="boogeyman" job="/bin/echo 123 > /tmp/boogeyman-notif.log" cron_file=boogeyman
+
+- name: Cron clean old power statistic data
+  cron: name="boogeyman_ce102_power_clean" minute=0 hour=0 user="boogeyman" job="echo \"delete from ce102_power where time < $(date --date=\"-40 days\" +%s);\" | sqlite3 /home/boogeyman/htdocs/storage/database/boogeyman.sqlite " cron_file=boogeyman
+
+- name: Cron clean old tarif statistic data
+  cron: name="boogeyman_ce102_tarif_clean" minute=1 hour=0 user="boogeyman" job="echo \"delete from ce102_tarif where time < $(date --date=\"-50 days\" +%s);\" | sqlite3 /home/boogeyman/htdocs/storage/database/boogeyman.sqlite " cron_file=boogeyman
+
+- name: Cron clean old history data
+  cron: name="boogeyman_history_clean" minute=0 hour=0 user="boogeyman" job="echo \"delete from history where time < $(date --date=\"-7 days\" +%s);\" | sqlite3 /home/boogeyman/htdocs/storage/database/boogeyman.sqlite " cron_file=boogeyman
+
+- name: Copy init.d boogeyman
+  copy: src=boogeyman.sh dest=/etc/init.d/boogeyman owner=root group=root mode=0755
+  register: st
+
+#- name: Init rc.d
+#  shell: update-rc.d boogeyman defaults
+#  when: st.changed
+
+- name: Stop boogeyman
+  shell: sudo /etc/init.d/boogeyman stop
+  ignore_errors: yes
+  when: sync2.changed or sync.changed
+
+- name: Start boogeyman
+  service: name=boogeyman state=started enabled=yes
+  when: sync2.changed or sync.changed

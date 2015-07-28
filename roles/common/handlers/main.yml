@@ -1,0 +1,16 @@
+---
+
+- name: restart fail2ban
+  service: name=fail2ban state=restarted enabled=yes
+
+- name: restart exim4
+  service: name=exim4 state=restarted enabled=yes
+
+- name: restart rsyslog
+  service: name=rsyslog state=restarted enabled=yes
+
+- name: restart sshd
+  service: name=ssh state=restarted enabled=yes
+
+- name: restart ntp
+  service: name=ntp state=restarted enabled=yes

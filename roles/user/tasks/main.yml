@@ -1,0 +1,15 @@
+---
+
+- name: Manage groups
+  group: name={{ item.name }} state={{ item.state }}
+  with_items: groups_list
+
+- name: Manage users
+  user: name={{ item.name }} state={{ item.state }} groups={{ item.groups }} shell=/bin/bash
+  with_items: users_list
+
+- name: Setting authorized_keys
+  authorized_key: user={{ item.0.name }} key="{{ item.1.key }}" state={{ item.1.state }}
+  with_subelements:
+    - users_list
+    - auth_keys

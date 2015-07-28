@@ -1,0 +1,7 @@
+---
+
+- name: restart minidlna
+  service: name=minidlna state=restarted enabled=yes
+
+- name: reload transmission-daemon
+  service: name=transmission-daemon state=reloaded enabled=yes

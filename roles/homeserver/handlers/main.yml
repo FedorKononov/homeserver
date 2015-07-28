@@ -1,0 +1,19 @@
+---
+
+- name: restart iptables
+  shell: iptables-restore < /etc/iptables/rules.v4
+
+- name: restart nginx
+  service: name=nginx state=restarted enabled=yes
+
+- name: reload nginx
+  service: name=nginx state=reloaded
+
+- name: restart php-fpm
+  service: name=php5-fpm state=restarted enabled=yes
+
+- name: update-grub
+  shell: update-grub
+
+- name: restart memcached
+  service: name=memcached state=restarted enabled=yes

@@ -1,0 +1,42 @@
+---
+
+#
+# Общий список пользователей применимый ко всем машинам если нет переопреопределения на группах или хостах
+# Пользователь может иметь несколько публичных ключей
+#
+
+users_list:
+
+  - name: fkononov
+    state: present
+    groups: adm,sudo,developers,mercurial
+    scope: 'GLOBAL'
+    auth_keys:
+      - key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBbZOwnLFE+43DouCHID8fKTEVQRG0HHzoyvvKd6UqWH7h4ElpHbKb3ZXqCj1nafAm1jaq5+9ka2NkgzJNtmuqFEle66kn5R6c6mzeuIgetHu2+hQQPu3H4YPdqSNkQAw3CqRmwCCFftYieaFFNuI2zqaGMLyu3E2pdD/PU9bldhDbZliV7Z3ZMOqWQ6S4clkjxQK5DBnqj5/40Trr86gNxQX/1IpL85c3h3Yfu9IPpjii/8B+hJRrIHMoSr0OylsuAranVHeEd5JvbXkK2w51VzPAO1izQia5DPXhxGjUAScL9bai40Zc7SXzinGVMxO0+uuhj9sslcABEh3RN0eT fkononov@mintol
+        state: present
+
+#
+# Общий список групп применимый ко всем машинам (группы и хосты могут его переопределить)
+#
+
+groups_list:
+
+  - name: sudo
+    state: present
+
+  - name: adm
+    state: present
+
+  - name: developers
+    state: present
+
+  - name: mercurial
+    state: present
+
+#
+# Общий список судо файлов применимый ко всем машинам
+# Сами судо файлы хранятся в в ролях
+#
+
+sudoers_files:
+  - sudo

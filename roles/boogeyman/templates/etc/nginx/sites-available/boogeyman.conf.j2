@@ -1,0 +1,56 @@
+upstream boogeyman_backend {
+    server 127.0.0.1:9000 fail_timeout=0;
+}
+
+server {
+    listen 88;
+
+    server_name  boogeyman 192.168.10.106;
+
+    access_log  /var/log/nginx/boogeyman.access.log detailed;
+    error_log   /var/log/nginx/boogeyman.error.log;
+
+    client_max_body_size 4M;
+
+    location ~ (^|/)\. {
+        deny  all;
+    }
+
+    location ~ \.php$ {
+        deny all;
+    }
+
+    root /home/boogeyman/htdocs/public;
+
+    location ^~ /style/ {
+        try_files $uri =404;
+        access_log off;
+        expires 1d;
+        gzip on;
+    }
+
+    location / {
+        index  index.php index.html index.htm;
+        try_files $uri @backend;
+    }
+
+    location ~ ^(/images/|/static/) {
+        try_files $uri =404;
+        access_log off;
+        expires 1y;
+    }
+
+    location @backend {
+        include fastcgi_params;
+        fastcgi_param HTTPS Off;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_param SCRIPT_NAME     /index.php;
+        fastcgi_param QUERY_STRING    q=$uri&$args;
+        fastcgi_pass boogeyman_backend;
+    }
+
+    location ^~ /socket.io/ {
+        proxy_pass http://127.0.0.1:8080;
+        access_log off;
+    }
+}

@@ -1,0 +1,126 @@
+---
+
+- name: Checking if it's Debian
+  fail: msg="This is not Debian. Aborted."
+  when: ansible_distribution != "Debian"
+
+- name: Copy /etc/sysctl.d/modprobe.conf
+  copy: src=etc/sysctl.d/modprobe.conf dest=/etc/sysctl.d/modprobe.conf
+
+- name: Copy /etc/sysctl.d/network-security.conf
+  copy: src=etc/sysctl.d/network-security.conf dest=/etc/sysctl.d/network-security.conf
+
+- name: Copy /etc/sysctl.conf
+  copy: src=etc/sysctl.conf dest=/etc/sysctl.conf
+
+- name: Copy /etc/modules
+  copy: src=etc/modules dest=/etc/modules
+
+- name: Copy /etc/aliases
+  copy: src=etc/aliases dest=/etc/aliases
+
+- name: Copy /etc/ssh/sshd_config
+  copy: src=etc/ssh/sshd_config dest=/etc/ssh/sshd_config
+  notify:
+    - restart sshd
+
+- name: Copy /etc/apt/sources.list
+  copy: src=etc/apt/sources.list dest=/etc/apt/sources.list
+  register: sources1
+
+- name: Copy /etc/apt/sources.list.d/dotdeb-source.list
+  copy: src=etc/apt/sources.list.d/dotdeb-source.list dest=/etc/apt/sources.list.d/dotdeb-source.list
+  register: sources2
+
+- name: Key for dotdeb-source.list
+  apt_key: url=http://www.dotdeb.org/dotdeb.gpg state=present
+
+- name: Copy /etc/apt/sources.list.d/nodesource.list
+  copy: src=etc/apt/sources.list.d/nodesource.list dest=/etc/apt/sources.list.d/nodesource.list
+  register: sources3
+
+- name: Key for nodesource.list
+  apt_key: url=https://deb.nodesource.com/gpgkey/nodesource.gpg.key state=present
+
+- name: Installing apt-transport-https
+  apt: name=apt-transport-https state=installed
+  register: apt_https
+
+- name: Updating apt cache
+  apt: update_cache=yes
+  when: sources1.changed or sources2.changed or sources3.changed or apt_https.changed
+
+- name: Installing locales
+  locale_gen: name=en_US state=present
+  locale_gen: name=en_US.UTF-8 state=present
+  locale_gen: name=ru_RU state=present
+  locale_gen: name=ru_RU.UTF-8 state=present
+
+- name: Installing fail2ban
+  apt: name=fail2ban state=installed
+
+- name: Copy /etc/fail2ban/jail.conf
+  copy: src=etc/fail2ban/jail.conf dest=/etc/fail2ban/jail.conf
+  notify:
+    - restart fail2ban
+
+- name: Template /etc/hosts
+  template: src=etc/hosts.j2 dest=/etc/hosts
+
+- name: Installing exim4-daemon-light
+  apt: name=exim4-daemon-light state=installed
+
+- name: Installing exim4-config
+  apt: name=exim4-config state=installed
+
+- name: Installing exim4-base
+  apt: name=exim4-base state=installed
+  notify:
+  - restart exim4
+
+- name: Template /etc/exim4/exim4.conf
+  template: src=etc/exim4/exim4.j2 dest=/etc/exim4/exim4.conf
+  notify:
+    - restart exim4
+
+- name: Installing rsyslog
+  apt: name=rsyslog state=installed
+  notify:
+    - restart rsyslog
+
+- name: Install iotop
+  apt: name=iotop state=installed
+
+- name: Install sudo
+  apt: name=sudo state=installed
+
+- name: Install iptables-persistent
+  apt: name=iptables-persistent state=installed
+
+- name: Installing ntp
+  apt: name=ntp state=installed
+  notify:
+    - restart ntp
+
+- name: Copy /etc/ntp.conf
+  copy: src=etc/ntp.conf dest=/etc/ntp.conf
+  notify:
+    - restart ntp
+
+- name: Disable bluetooth
+  service: name=bluetooth state=stopped enabled=no
+
+- name: Install maradns
+  apt: name=maradns state=installed install_recommends=no
+  register: mara_inst
+
+- name: Template /etc/maradns/mararc
+  template: src=etc/maradns/mararc.j2 dest=/etc/maradns/mararc
+  register: mara_change
+
+- name: restarting maradns immediately
+  service: name=maradns state=restarted enabled=yes
+  when: mara_change.changed
+
+- name: Copy /etc/resolv.conf
+  copy: src=etc/resolv.conf dest=/etc/resolv.conf

@@ -1,0 +1,42 @@
+# mararc
+
+csv1 = {}
+
+bind_address = "127.0.0.3"
+chroot_dir = "/etc/maradns"
+maradns_uid = {{maradns_uid|default(113)}}
+maradns_gid = {{maradns_gid|default(121)}}
+
+maxprocs = 96
+# max_tcp_procs = 64
+
+no_fingerprint = 1
+default_rrany_set = 3
+
+max_chain = 8
+max_ar_chain = 1
+max_total = 20
+
+verbose_level = 1
+
+ipv4_alias = {}
+ipv4_alias["hetzner"] = "213.133.100.100,213.133.99.99,213.133.98.98"
+ipv4_alias["icann"] = "198.41.0.4,192.228.79.201,192.33.4.12,128.8.10.90,192.203.230.10,192.5.5.241,192.112.36.4,128.63.2.53,192.36.148.17,192.58.128.30,193.0.14.129,199.7.83.42,202.12.27.33"
+ipv4_alias["osrc"] = "199.166.24.1,205.189.73.102,199.166.24.3,207.126.103.16,195.117.6.10,205.189.73.10,204.57.55.100,213.196.2.97"
+ipv4_alias["alternic"] = "160.79.129.192,24.6.78.12,160.79.133.70,65.15.8.202,216.162.42.240,195.224.64.190,160.79.133.66,216.162.42.185"
+ipv4_alias["opennic"] = "131.161.247.226,209.151.84.102,64.247.218.140,64.247.218.149,209.104.33.250,209.104.63.249,209.151.84.103,199.175.137.211,207.6.128.246,65.243.92.254"
+
+ipv4_alias["localhost"] = "127.0.0.0/8"
+recursive_acl = "localhost"
+
+# random_seed_file = "/dev/urandom"
+# maximum_cache_elements = 1024
+min_ttl = 120
+min_ttl_cname = 120
+
+root_servers = {}
+root_servers["."] = "icann"
+
+# timeout_seconds = 2
+
+hide_disclaimer = "YES"

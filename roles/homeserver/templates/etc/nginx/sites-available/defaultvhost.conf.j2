@@ -1,0 +1,22 @@
+server {
+    listen 80 default_server;
+
+    server_name  {{ ansible_nodename }};
+
+    access_log  /var/log/nginx/{{ ansible_nodename }}.access.log;
+    error_log   /var/log/nginx/{{ ansible_nodename }}.error.log;
+
+
+    location / {
+        return 404;
+    }
+
+    location = /nginx-status {
+        stub_status on;
+        access_log  off;
+
+        allow 192.168.10.0/24;
+        deny all;
+    }
+
+}

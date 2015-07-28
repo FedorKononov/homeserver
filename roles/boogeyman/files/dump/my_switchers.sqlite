@@ -1,0 +1,23 @@
+INSERT INTO "hdl_device" VALUES(3,'Диммер 2','second_dimmer',1350634299,1360581348,NULL,95,1,3);
+INSERT INTO "hdl_device" VALUES(5,'Диммер 1','first_dimmer',1350843869,1360581359,NULL,90,1,3);
+INSERT INTO "hdl_device" VALUES(6,'Реле 1','first_rele',1350845245,1360581369,NULL,80,1,4);
+INSERT INTO "hdl_device" VALUES(7,'Псевдо реле (лента)','pseudo_rele',1356456609,1360573820,NULL,91,1,4);
+INSERT INTO "hdl_device" VALUES(8,'Логический модуль','logic',1358963326,1360581385,NULL,50,1,5);
+INSERT INTO "hdl_device" VALUES(9,'8 in 1','eight_in_one',1359041230,1359041230,NULL,30,1,5);
+INSERT INTO "hdl_device" VALUES(10,'DLP панель','dlp_panel',1359298206,1360581396,NULL,10,1,6);
+INSERT INTO "hdl_device" VALUES(11,'Broadcast','broadcast',1360507909,1360507909,NULL,255,255,7);
+
+
+INSERT INTO "hdl_switcher" VALUES(2,'Гостинная','light_small_room',1354217184,1362424834,NULL,5,4,'{"7":"4","8":"0","11":"0","12":"0"}', 0);
+INSERT INTO "hdl_switcher" VALUES(3,'Спальня','light_in_the_bedroom',1356376325,1361893355,NULL,3,4,'{"7":"3","8":0,"11":"0","12":"0"}', 0);
+INSERT INTO "hdl_switcher" VALUES(4,'Спальня лента','beedrom_led_light',1356376548,1362926848,NULL,7,8,'{"16":"5","17":"0","18":"","19":""}', 0);
+INSERT INTO "hdl_switcher" VALUES(5,'Коридор','light_in_the_hall',1356376663,1362151949,NULL,3,4,'{"7":"1","8":0,"11":"0","12":"0"}', 0);
+INSERT INTO "hdl_switcher" VALUES(6,'Кухня','light_in_the_kitchen',1356376792,1362153612,NULL,3,4,'{"7":"4","8":0,"11":"0","12":"0"}', 0);
+INSERT INTO "hdl_switcher" VALUES(7,'Туалет','light_in_the_toilet',1356377020,1362424865,NULL,5,4,'{"7":"3","8":"0","11":"0","12":"0"}', 0);
+INSERT INTO "hdl_switcher" VALUES(8,'Пол кухня','floor_heat_kitchen',1357988163,1361094422,NULL,6,8,'{"16":"1","17":0,"18":"","19":""}', 0);
+INSERT INTO "hdl_switcher" VALUES(9,'Пол ванная','floor_heat_bathroom',1358019131,1361091489,NULL,6,8,'{"16":"2","17":0,"18":"","19":""}', 0);
+INSERT INTO "hdl_switcher" VALUES(10,'Свич ванная','unversal_test',1358965122,1362424878,NULL,8,5,'{"13":"212","14":"0"}', 0);
+INSERT INTO "hdl_switcher" VALUES(11,'Свич вход','main_door',1359038392,1362151948,NULL,9,5,'{"13":"251","14":0}', 0);
+INSERT INTO "hdl_switcher" VALUES(14,'Цветная лента','beedrom_color_led_light',1360604224,1361091453,NULL,6,8,'{"16":"3","17":0,"18":"","19":""}', 0);
+
+INSERT INTO "hdl_sensor" VALUES(1,'Спальня t&deg;','beedrom_temperature',1359307869,1362144767,NULL,10,6,'{"15":26}', 0);

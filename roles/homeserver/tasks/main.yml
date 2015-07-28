@@ -1,0 +1,69 @@
+---
+
+- name: Copy /etc/default/grub
+  copy: src=etc/default/grub dest=/etc/default/grub
+  notify:
+    - update-grub
+
+- name: Copy /etc/sysctl.d/conntrack.conf
+  copy: src=etc/sysctl.d/conntrack.conf dest=/etc/sysctl.d/conntrack.conf
+
+- name: Copy /etc/iptables/rules.v4
+  copy: src=etc/iptables/rules.v4 dest=/etc/iptables/rules.v4
+  notify:
+    - restart iptables
+
+- name: Copy sudoers files
+  copy: src=etc/sudoers.d/{{ item }} dest=/etc/sudoers.d/{{ item }} mode=0440
+  with_items: sudoers_files
+
+- name: Ensure nginx installed.
+  apt: name=nginx state=installed
+  notify:
+    - restart nginx
+
+- name: mkdir /var/log/php5-fpm
+  file: path=/var/log/php5-fpm state=directory
+
+- name: Ensure PHP packages are installed.
+  apt: name={{ item }} state=installed
+  with_items: php_packages
+  register: php_install
+  notify: 
+    - restart php-fpm
+
+- name: Remove /etc/php5/conf.d/*
+  shell: rm -f /etc/php5/conf.d/*
+  when: php_install.changed
+
+- name: Copy /etc/nginx/nginx.conf
+  copy: src=etc/nginx/nginx.conf dest=/etc/nginx/nginx.conf
+  notify:
+    - restart nginx
+
+- name: Template /etc/nginx/sites-available/defaultvhost.conf
+  template: src=etc/nginx/sites-available/defaultvhost.conf.j2 dest=/etc/nginx/sites-available/defaultvhost.conf mode=0644
+  notify:
+    - reload nginx
+
+- name: Copy fpm/php.ini
+  copy: src=etc/php5/fpm/php.ini dest=/etc/php5/fpm/php.ini
+  notify: 
+    - restart php-fpm
+
+- name: Copy fpm/php-fpm.conf
+  copy: src=etc/php5/fpm/php-fpm.conf dest=/etc/php5/fpm/php-fpm.conf
+  notify: 
+    - restart php-fpm
+
+- name: Copy cli/php.ini
+  copy: src=etc/php5/cli/php.ini dest=/etc/php5/cli/php.ini
+
+- name: install memcached
+  apt: name=memcached state=present
+
+- name: Copy etc/memcached.conf
+  copy: src=etc/memcached.conf dest=/etc/memcached.conf
+  notify: 
+    - restart memcached
+

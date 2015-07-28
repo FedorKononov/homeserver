@@ -1,0 +1,14 @@
+# /etc/aliases
+abuse: root
+ftp: root
+hostmaster: root
+mailer-daemon: postmaster
+news: root
+nobody: root
+noc: root
+postmaster: root
+root: admin@kainet.ru
+security: root
+usenet: root
+webmaster: root
+www: root
